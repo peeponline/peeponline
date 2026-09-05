@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import api from '../../api/axiosConfig';
+import api, { API_URL } from '../../api/axiosConfig';
 import toast from 'react-hot-toast';
 
 const Login = () => {
@@ -102,7 +102,7 @@ const Login = () => {
           <div className="section-eyebrow">Your account</div>
           <h2>Sign in</h2>
           <p className="peep-auth-intro">Welcome back to Peep Online Marketplace.</p>
-          <a href={`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/google`} className="peep-auth-google"><i className="ti ti-brand-google"></i> Continue with Google</a>
+          <a href={`${API_URL}/auth/google`} className="peep-auth-google"><i className="ti ti-brand-google"></i> Continue with Google</a>
           <div className="peep-auth-divider"><span>or</span></div>
           {verificationComplete && <details className="peep-otp-success peep-login-success" open><summary><i className="ti ti-circle-check"></i><span>Email verified and account created</span><i className="ti ti-chevron-down"></i></summary><div><p>Your account is ready. Sign in below to continue shopping.</p></div></details>}
           {loginError && <div className="peep-auth-error" role="alert"><i className="ti ti-alert-circle"></i><span>{loginError}</span></div>}

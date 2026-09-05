@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import api from '../../api/axiosConfig';
+import api, { API_URL } from '../../api/axiosConfig';
 import toast from 'react-hot-toast';
 
 const countries = ['Ghana', 'Nigeria'];
@@ -171,7 +171,7 @@ const Register = () => {
           <div className="section-eyebrow">New account</div>
           <h2>Create your account</h2>
           <p className="peep-auth-intro">A few details and you are ready to peep online.</p>
-          <a href={`${import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}/auth/google`} className="peep-auth-google"><i className="ti ti-brand-google"></i> Sign up with Google</a>
+          <a href={`${API_URL}/auth/google`} className="peep-auth-google"><i className="ti ti-brand-google"></i> Sign up with Google</a>
           <div className="peep-auth-divider"><span>or</span></div>
           {formError && <div className="peep-auth-error" role="alert"><i className="ti ti-alert-circle"></i><span>{formError}</span></div>}
           <form onSubmit={handleSubmit} className="peep-auth-form peep-register-form">
