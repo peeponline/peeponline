@@ -36,8 +36,10 @@ Create the upload directory and grant the account running Node.js write access b
 
 ```sh
 sudo mkdir -p /var/www/uploads/products
-sudo chown -R <node-user>:<node-user> /var/www/uploads
+sudo chown -R "$(id -un)":"$(id -gn)" /var/www/uploads
 ```
+
+Run the API with the same user that owns this directory. If PM2 runs the API as `www-data` instead, use `sudo chown -R www-data:www-data /var/www/uploads`.
 
 In Google Cloud Console, add this authorized redirect URI:
 

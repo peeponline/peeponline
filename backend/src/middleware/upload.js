@@ -20,12 +20,24 @@ const createWatermark = async (width) => {
     .resize({ width: Math.max(64, Math.round(width * 0.12)), withoutEnlargement: true })
     .png()
     .toBuffer({ resolveWithObject: true });
-  const logoData = logo.data.toString('base64');
   const textSize = Math.max(10, Math.round(logo.info.height * 0.2));
   const textWidth = Math.round(textSize * 7.8);
-  const watermarkSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${logo.info.width + textWidth + 8}" height="${logo.info.height}"><g opacity="0.32"><image href="data:image/png;base64,${logoData}" width="${logo.info.width}" height="${logo.info.height}"/><text x="${logo.info.width + 8}" y="${Math.round(logo.info.height / 2 + textSize * 0.35)}" fill="white" font-family="Arial, sans-serif" font-size="${textSize}" font-weight="600">peeponline.store</text></g></svg>`;
+  const textSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${textWidth}" height="${logo.info.height}"><text x="0" y="${Math.round(logo.info.height / 2 + textSize * 0.35)}" fill="white" fill-opacity="0.32" font-family="Arial, sans-serif" font-size="${textSize}" font-weight="600">peeponline.store</text></svg>`;
 
-  return sharp(Buffer.from(watermarkSvg)).png().toBuffer();
+  return sharp({
+    create: {
+      width: logo.info.width + textWidth + 8,
+      height: logo.info.height,
+      channels: 4,
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
+    },
+  })
+    .composite([
+      { input: logo.data, left: 0, top: 0 },
+      { input: Buffer.from(textSvg), left: logo.info.width + 8, top: 0 },
+    ])
+    .png()
+    .toBuffer();
 };
 
 const processUploadedImages = async (files) => {
