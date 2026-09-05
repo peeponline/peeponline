@@ -3,10 +3,11 @@ const Category = require('../models/Category');
 const Order = require('../models/Order');
 const fs = require('fs/promises');
 const path = require('path');
+const { uploadsDirectory } = require('../config/uploads');
 
 const removeStoredImage = async (image) => {
   if (!image?.url) return;
-  const filePath = path.join(__dirname, '../../uploads', image.url.replace(/^\/uploads\//, ''));
+  const filePath = path.join(uploadsDirectory, image.url.replace(/^\/uploads\//, ''));
   try {
     await fs.unlink(filePath);
   } catch (error) {
@@ -206,7 +207,7 @@ exports.deleteProduct = async (req, res) => {
 
     for (const img of product.images) await removeStoredImage(img);
 
-    await product.remove();
+    await Product.findByIdAndDelete(product._id);
     res.status(200).json({ success: true, message: 'Product deleted' });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

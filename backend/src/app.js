@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 const session = require('express-session');
 const passport = require('passport');
 const errorHandler = require('./middleware/errorHandler');
+const { uploadsDirectory } = require('./config/uploads');
 require('./config/passport');
 
 // Route imports
@@ -41,7 +42,7 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/uploads', express.static(uploadsDirectory));
 app.use(session({
   secret: process.env.SESSION_SECRET || 'peep-session-secret',
   resave: false,

@@ -1651,10 +1651,19 @@ body {
   .nav-logo { gap: 7px; }
   .nav-logo img { width: 30px; height: 30px; }
   .nav-logo-text { font-size: 12px; }
-  .nav-right { gap: 5px; }
+  .nav-right { gap: 4px; }
   .nav-icon-button { width: 32px; height: 32px; font-size: 16px; border-radius: 8px; }
   .nav-toggle { font-size: 21px; padding: 3px; }
   .nav-drawer { top: 60px; }
+  .nav-search-dropdown,
+  .nav-cart-dropdown {
+    position: fixed;
+    top: 60px;
+    right: 10px;
+    left: 10px;
+    width: auto;
+    max-width: none;
+  }
   .peep-app-main { padding-top: 60px; padding-left: 10px; padding-right: 10px; }
   .peep-home-hero { min-height: calc(100svh - 60px); padding: 64px 20px 48px; }
   .peep-home-title { font-size: clamp(30px, 10vw, 46px); }

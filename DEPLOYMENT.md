@@ -26,9 +26,17 @@ Set these production values in `backend/.env`:
 PORT=3000
 FRONTEND_URL=https://peeponline.store
 GOOGLE_CALLBACK_URL=https://api.peeponline.store/api/auth/google/callback
+UPLOADS_DIR=/var/www/uploads
 ```
 
 Keep the existing database, JWT, payment, email, and Google credentials in the server-only `.env` file. Do not commit that file.
+
+Create the upload directory and grant the account running Node.js write access before starting the API:
+
+```sh
+sudo mkdir -p /var/www/uploads/products
+sudo chown -R <node-user>:<node-user> /var/www/uploads
+```
 
 In Google Cloud Console, add this authorized redirect URI:
 

@@ -30,6 +30,21 @@ const Header = () => {
     const keyword = searchTerm.trim();
     navigate(keyword ? `/shop?keyword=${encodeURIComponent(keyword)}` : '/shop');
   };
+  const toggleSearch = () => {
+    setIsSearchOpen((current) => !current);
+    setIsCartMenuOpen(false);
+    setIsAccountMenuOpen(false);
+  };
+  const toggleCart = () => {
+    setIsCartMenuOpen((current) => !current);
+    setIsSearchOpen(false);
+    setIsAccountMenuOpen(false);
+  };
+  const toggleAccount = () => {
+    setIsAccountMenuOpen((current) => !current);
+    setIsSearchOpen(false);
+    setIsCartMenuOpen(false);
+  };
 
   return (
     <>
@@ -64,11 +79,11 @@ const Header = () => {
 
         <div className="nav-right">
           <div className="nav-search-menu">
-            <button type="button" className="nav-icon-button" aria-label="Search products" title="Search products" aria-expanded={isSearchOpen} onClick={() => setIsSearchOpen(!isSearchOpen)}><i className="ti ti-search"></i></button>
+            <button type="button" className="nav-icon-button" aria-label="Search products" title="Search products" aria-expanded={isSearchOpen} onClick={toggleSearch}><i className="ti ti-search"></i></button>
             {isSearchOpen && <form className="nav-search-dropdown" onSubmit={handleSearch}><input type="search" autoFocus value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="Search products" aria-label="Search products" /><button type="submit" aria-label="Submit search"><i className="ti ti-arrow-right"></i></button></form>}
           </div>
           <div className="nav-cart-menu">
-            <button type="button" className="nav-icon-button" aria-label="View cart" title="View cart" aria-expanded={isCartMenuOpen} onClick={() => setIsCartMenuOpen(!isCartMenuOpen)}>
+            <button type="button" className="nav-icon-button" aria-label="View cart" title="View cart" aria-expanded={isCartMenuOpen} onClick={toggleCart}>
               <i className="ti ti-shopping-cart"></i>{itemCount > 0 && <span className="nav-cart-count">{itemCount > 99 ? '99+' : itemCount}</span>}
             </button>
             {isCartMenuOpen && <div className="nav-cart-dropdown">
@@ -85,7 +100,7 @@ const Header = () => {
               aria-label={user ? 'Open dashboard menu' : 'Open account menu'}
               title={user ? 'Open dashboard menu' : 'Sign in or register'}
               aria-expanded={isAccountMenuOpen}
-              onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
+              onClick={toggleAccount}
             >
               <i className="ti ti-user"></i>
             </button>
