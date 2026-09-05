@@ -9,6 +9,7 @@ const requiredCategoryGroups = [
   'Accessories',
   'Components & Parts',
 ];
+const maxImageSize = 5 * 1024 * 1024;
 
 const ProductManager = () => {
   const [products, setProducts] = useState([]);
@@ -63,6 +64,18 @@ const ProductManager = () => {
 
   const resetForm = () => { setEditingId(null); setForm(emptyProduct); setFiles([]); };
 
+  const handleImageSelection = (event) => {
+    const selectedFiles = Array.from(event.target.files || []);
+    const oversizedFile = selectedFiles.find((file) => file.size > maxImageSize);
+    if (oversizedFile) {
+      setFiles([]);
+      event.target.value = '';
+      toast.error(`${oversizedFile.name} is larger than 5MB. Please choose a smaller image.`);
+      return;
+    }
+    setFiles(selectedFiles.slice(0, 5));
+  };
+
   const submitForm = async (event, ignoreWeightWarning = false) => {
     event.preventDefault();
     if (!form.weightKg && !ignoreWeightWarning) {
@@ -101,13 +114,13 @@ const ProductManager = () => {
       <div className="peep-admin-panel-heading"><div><span>{editingId ? 'Edit catalogue item' : 'New catalogue item'}</span><h2>{editingId ? 'Update product' : 'Create product'}</h2></div><i className="ti ti-device-laptop"></i></div>
       <div className="peep-admin-form-grid">
         <label>Title<input name="name" value={form.name} onChange={updateField} required maxLength="100" /></label>
-        <label>Price (GHS)<input name="price" type="number" min="0" step="0.01" value={form.price} onChange={updateField} required /></label>
-        <label>Weight (kg)<input ref={weightInputRef} name="weightKg" type="number" min="0" step="0.01" value={form.weightKg} onChange={updateField} placeholder="0.5" /></label>
+        <label>Price (GHS)<input name="price" type="number" inputMode="decimal" min="0" step="0.01" value={form.price} onChange={updateField} required /></label>
+        <label>Weight (kg)<input ref={weightInputRef} name="weightKg" type="number" inputMode="decimal" min="0" step="0.01" value={form.weightKg} onChange={updateField} placeholder="0.5" /></label>
         <label>Tab<select name="tab" value={form.tab} onChange={updateField} required><option value="">Choose a tab</option>{requiredCategoryGroups.map((tab) => <option key={tab} value={tab}>{tab}</option>)}</select></label>
         <label>Category<select name="category" value={form.category} onChange={updateField} required><option value="">Choose a category</option>{categories.map((category) => <option key={category._id} value={category._id}>{category.name}</option>)}</select></label>
-        <label>Stock<input name="stock" type="number" min="0" value={form.stock} onChange={updateField} /></label>
+        <label>Stock<input name="stock" type="number" inputMode="numeric" min="0" value={form.stock} onChange={updateField} /></label>
         <label className="peep-admin-form-wide">Description<textarea name="description" rows="4" value={form.description} onChange={updateField} required maxLength="2000" /></label>
-        <label className="peep-admin-form-wide peep-admin-file-field">Product images <small>Up to 5 images, 5MB each</small><span className="peep-admin-file-picker"><i className="ti ti-cloud-upload"></i><strong>{files.length ? `${files.length} image${files.length === 1 ? '' : 's'} selected` : 'Choose product images'}</strong><em>JPG, PNG, WEBP or GIF</em><input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple onChange={(event) => setFiles(Array.from(event.target.files || []).slice(0, 5))} /></span></label>
+        <label className="peep-admin-form-wide peep-admin-file-field">Product images <small>Up to 5 images, 5MB each</small><span className="peep-admin-file-picker"><i className="ti ti-cloud-upload"></i><strong>{files.length ? `${files.length} image${files.length === 1 ? '' : 's'} selected` : 'Choose product images'}</strong><em>JPG, PNG, WEBP or GIF</em><input type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple onChange={handleImageSelection} /></span></label>
         <label className="peep-admin-checkbox"><input name="isFeatured" type="checkbox" checked={form.isFeatured} onChange={updateField} /> Feature this product</label>
       </div>
       <div className="peep-admin-form-actions"><button className="btn btn-primary" type="submit" disabled={saving}>{saving ? 'Saving...' : editingId ? 'Update product' : 'Create product'}</button>{editingId && <button className="btn btn-outline" type="button" onClick={resetForm}>Cancel</button>}</div>

@@ -17,12 +17,23 @@ const createWatermark = async (width) => {
 
   const logo = await sharp(watermarkPath)
     .trim()
-    .resize({ width: Math.max(64, Math.round(width * 0.12)), withoutEnlargement: true })
-    .png()
+    .resize({ width: Math.max(48, Math.round(width * 0.08)), withoutEnlargement: true })
+    .ensureAlpha()
+    .raw()
     .toBuffer({ resolveWithObject: true });
+  for (let index = 3; index < logo.data.length; index += logo.info.channels) {
+    logo.data[index] = Math.round(logo.data[index] * 0.38);
+  }
+  const logoBuffer = await sharp(logo.data, {
+    raw: {
+      width: logo.info.width,
+      height: logo.info.height,
+      channels: logo.info.channels,
+    },
+  }).png().toBuffer();
   const textSize = Math.max(10, Math.round(logo.info.height * 0.2));
   const textWidth = Math.round(textSize * 7.8);
-  const textSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${textWidth}" height="${logo.info.height}"><text x="0" y="${Math.round(logo.info.height / 2 + textSize * 0.35)}" fill="white" fill-opacity="0.32" font-family="Arial, sans-serif" font-size="${textSize}" font-weight="600">peeponline.store</text></svg>`;
+  const textSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${textWidth}" height="${logo.info.height}"><text x="0" y="${Math.round(logo.info.height / 2 + textSize * 0.35)}" fill="white" fill-opacity="0.72" stroke="#050D1A" stroke-opacity="0.55" stroke-width="0.8" paint-order="stroke" font-family="Arial, sans-serif" font-size="${textSize}" font-weight="600">peeponline.store</text></svg>`;
 
   return sharp({
     create: {
@@ -33,7 +44,7 @@ const createWatermark = async (width) => {
     },
   })
     .composite([
-      { input: logo.data, left: 0, top: 0 },
+      { input: logoBuffer, left: 0, top: 0 },
       { input: Buffer.from(textSvg), left: logo.info.width + 8, top: 0 },
     ])
     .png()
