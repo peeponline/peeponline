@@ -27,6 +27,7 @@ PORT=3000
 FRONTEND_URL=https://peeponline.store
 GOOGLE_CALLBACK_URL=https://api.peeponline.store/api/auth/google/callback
 UPLOADS_DIR=/var/www/uploads
+WATERMARK_PATH=/var/www/peeponline/frontend/public/logo.png
 ```
 
 Keep the existing database, JWT, payment, email, and Google credentials in the server-only `.env` file. Do not commit that file.

@@ -4,6 +4,7 @@ const Order = require('../models/Order');
 const fs = require('fs/promises');
 const path = require('path');
 const { uploadsDirectory } = require('../config/uploads');
+const { processUploadedImages } = require('../middleware/upload');
 
 const removeStoredImage = async (image) => {
   if (!image?.url) return;
@@ -130,6 +131,7 @@ exports.createProduct = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Category not found' });
     }
 
+    await processUploadedImages(req.files || []);
     const images = (req.files || []).map((file) => ({
       public_id: file.filename,
       url: `/uploads/products/${file.filename}`,
@@ -182,6 +184,7 @@ exports.updateProduct = async (req, res) => {
 
     // Handle new images: if files are uploaded, replace existing ones
     if (req.files && req.files.length > 0) {
+      await processUploadedImages(req.files);
       for (const img of product.images) await removeStoredImage(img);
       // Set new images
       product.images = req.files.map(file => ({

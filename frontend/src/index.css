@@ -1664,6 +1664,7 @@ body {
     width: auto;
     max-width: none;
   }
+  .nav-search-dropdown input { font-size: 16px; }
   .peep-app-main { padding-top: 60px; padding-left: 10px; padding-right: 10px; }
   .peep-home-hero { min-height: calc(100svh - 60px); padding: 64px 20px 48px; }
   .peep-home-title { font-size: clamp(30px, 10vw, 46px); }

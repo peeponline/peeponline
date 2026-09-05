@@ -76,6 +76,16 @@ function GoogleAuthSuccess() {
   return null;
 }
 
+function ScrollToTop() {
+  const { pathname, search } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname, search]);
+
+  return null;
+}
+
 function AppLayout() {
   const location = useLocation();
   const hideFooter = location.pathname.startsWith('/dashboard');
@@ -160,6 +170,7 @@ function App() {
       <AuthProvider>
         <CartProvider>
           <SavedProvider>
+            <ScrollToTop />
             <AppLayout />
           </SavedProvider>
         </CartProvider>
