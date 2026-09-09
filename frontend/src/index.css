@@ -298,6 +298,26 @@ body {
   grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
   gap: 18px;
 }
+.peep-shop-loading { min-height: 360px; }
+.peep-product-skeleton { overflow: hidden; pointer-events: none; }
+.peep-skeleton-block {
+  border-radius: 5px;
+  background: linear-gradient(90deg, rgba(59, 139, 235, 0.1), rgba(46, 207, 207, 0.2), rgba(59, 139, 235, 0.1));
+  background-size: 200% 100%;
+  animation: peep-skeleton-shimmer 1.5s ease-in-out infinite;
+}
+.peep-skeleton-image { height: 210px; border-radius: 0; }
+.peep-skeleton-brand { width: 38%; height: 10px; margin-bottom: 12px; }
+.peep-skeleton-title { width: 78%; height: 17px; margin-bottom: 10px; }
+.peep-skeleton-description { width: 92%; height: 11px; }
+.peep-skeleton-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 22px; }
+.peep-skeleton-price { width: 42%; height: 18px; }
+.peep-skeleton-action { width: 32px; height: 32px; border-radius: 9px; }
+.peep-product-skeleton .prod-info { min-height: 145px; }
+@keyframes peep-skeleton-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
 .peep-account-saved-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 18px; }
 .peep-shop-product-image { padding: 0; }
 .peep-shop-product-image img {
@@ -1699,6 +1719,7 @@ body {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
   }
+  .peep-shop-loading .peep-product-skeleton:not(:first-child) { display: none; }
   .peep-shop-section { padding-top: 44px; }
   .peep-product-detail-shell { padding: 28px 20px 24px; }
   .peep-product-reviews { padding: 24px 20px 58px; }
@@ -1721,6 +1742,7 @@ body {
   .prod-name { font-size: 12px; }
   .prod-spec { font-size: 10px; }
   .prod-img { height: 130px; }
+  .peep-skeleton-image { height: 130px; }
   .prod-bottom { align-items: flex-end; }
   .peep-product-actions { flex-direction: column-reverse; align-items: flex-end; gap: 4px; }
   .peep-shop-notice {
@@ -2059,6 +2081,7 @@ body {
 .peep-cart-remove { padding: 5px; border: 0; background: transparent; color: var(--orange); cursor: pointer; font: 11px var(--font-b); }
 .peep-cart-remove:hover { color: var(--white); }
 .peep-cart-summary { padding: 23px; border: 1px solid rgba(46, 207, 207, .2); border-radius: var(--r); background: var(--card); box-shadow: 0 18px 45px rgba(0, 0, 0, .16); }
+.peep-cart-availability-warning { margin-bottom: 16px; padding: 11px 12px; border: 1px solid rgba(255, 107, 53, .3); border-radius: 8px; background: rgba(255, 107, 53, .1); color: var(--orange); font-size: 11px; line-height: 1.5; }
 .peep-cart-summary-heading { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
 .peep-cart-summary-heading span { color: var(--teal); font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; }
 .peep-cart-summary-heading h2 { margin-top: 5px; font: 700 17px var(--font-d); }

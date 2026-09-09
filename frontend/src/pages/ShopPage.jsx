@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import api from '../api/axiosConfig';
 import ProductCard from '../components/product/ProductCard';
-import LoadingSpinner from '../components/common/LoadingSpinner';
+import ProductLoadingState from '../components/product/ProductLoadingState';
 
 const ShopPage = () => {
   const tabs = ['Laptops & Desktops', 'Phones & Tablets', 'Accessories', 'Components & Parts'];
@@ -110,7 +109,7 @@ const ShopPage = () => {
           <input type="number" name="maxPrice" placeholder="Max price" aria-label="Maximum price" value={filters.maxPrice} onChange={handleFilterChange} />
         </div>
 
-        {loading ? <LoadingSpinner /> : products.length > 0 ? (
+        {loading ? <ProductLoadingState /> : products.length > 0 ? (
           <>
             <div className="peep-shop-grid">
               {products.map((product) => <ProductCard key={product._id} product={product} />)}

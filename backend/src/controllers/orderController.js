@@ -22,11 +22,25 @@ exports.createOrder = async (req, res) => {
     // Verify stock availability and prepare order items
     const orderItems = [];
     for (const item of cart.items) {
+      if (!item.product) {
+        return res.status(400).json({
+          success: false,
+          message: 'A product in your cart is no longer available. Remove it before checkout.'
+        });
+      }
       const product = await Product.findById(item.product._id);
+      if (!product) {
+        return res.status(400).json({
+          success: false,
+          message: 'A product in your cart is no longer available. Remove it before checkout.'
+        });
+      }
       if (product.stock < item.quantity) {
         return res.status(400).json({
           success: false,
-          message: `Insufficient stock for ${product.name}`
+          message: product.stock > 0
+            ? `Only ${product.stock} left for ${product.name}. Update your cart before checkout.`
+            : `${product.name} is out of stock. Remove it before checkout.`
         });
       }
       orderItems.push({

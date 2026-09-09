@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const CartSummary = () => {
-  const { cart } = useCart();
+  const { cart, hasUnavailableItems } = useCart();
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -22,6 +22,7 @@ const CartSummary = () => {
   return (
     <div className="peep-cart-summary">
       <div className="peep-cart-summary-heading"><span>Checkout</span><h2>Order summary</h2></div>
+      {hasUnavailableItems && <p className="peep-cart-availability-warning">A product in your cart is no longer available or has insufficient stock. Remove it before checkout.</p>}
       <div className="peep-cart-summary-row">
         <span>Subtotal</span>
         <span>GHS {subtotal.toFixed(2)}</span>
@@ -37,6 +38,7 @@ const CartSummary = () => {
       <button
         onClick={handleCheckout}
         className="btn btn-primary peep-cart-checkout"
+        disabled={hasUnavailableItems}
       >
         Proceed to Checkout
       </button>

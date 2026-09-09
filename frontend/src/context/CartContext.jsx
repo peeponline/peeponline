@@ -20,6 +20,8 @@ const saveGuestCart = (nextCart) => {
   return nextCart;
 };
 
+export const isCartItemUnavailable = (item) => !item.product || Number(item.quantity) > Number(item.product.stock || 0);
+
 export const CartProvider = ({ children }) => {
   const { user } = useAuth();
   const [cart, setCart] = useState({ items: [], totalPrice: 0 });
@@ -127,6 +129,7 @@ export const CartProvider = ({ children }) => {
   const value = {
     cart,
     itemCount: cart.items.reduce((total, item) => total + item.quantity, 0),
+    hasUnavailableItems: cart.items.some(isCartItemUnavailable),
     loading,
     fetchCart,
     addToCart,

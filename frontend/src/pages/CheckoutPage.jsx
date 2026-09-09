@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 
 const CheckoutPage = () => {
   const { user } = useAuth();
-  const { cart, clearCart } = useCart();
+  const { cart, clearCart, hasUnavailableItems } = useCart();
   const navigate = useNavigate();
   const [shippingAddress, setShippingAddress] = useState({
     street: '',
@@ -30,6 +30,13 @@ const CheckoutPage = () => {
       setShippingAddress(user.address);
     }
   }, [user]);
+
+  useEffect(() => {
+    if (hasUnavailableItems) {
+      toast.error('A product in your cart is no longer available. Return to your cart to remove it.');
+      navigate('/cart', { replace: true });
+    }
+  }, [hasUnavailableItems, navigate]);
 
   useEffect(() => {
     api.get('/shipping').then((response) => {

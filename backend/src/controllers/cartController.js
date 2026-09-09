@@ -4,11 +4,25 @@ const Product = require('../models/Product');
 // @desc    Get user's cart
 exports.getCart = async (req, res) => {
   try {
-    let cart = await Cart.findOne({ user: req.user.id }).populate('items.product', 'name price stock discount images weightKg');
+    let cart = await Cart.findOne({ user: req.user.id });
 
     if (!cart) {
       cart = await Cart.create({ user: req.user.id, items: [] });
     }
+
+    const productIds = cart.items.map((item) => item.product.toString());
+    await cart.populate('items.product', 'name price stock discount images weightKg');
+    cart.items.forEach((item, index) => {
+      if (!item.product) {
+        item.product = {
+          _id: productIds[index],
+          name: 'Unavailable product',
+          stock: 0,
+          images: [],
+          weightKg: 0,
+        };
+      }
+    });
 
     res.status(200).json({ success: true, data: cart });
   } catch (error) {

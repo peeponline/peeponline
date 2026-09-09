@@ -2,10 +2,12 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import api from '../api/axiosConfig';
 import ProductCard from '../components/product/ProductCard';
+import ProductLoadingState from '../components/product/ProductLoadingState';
 
 const HomePage = () => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadStorefront = async () => {
@@ -19,6 +21,7 @@ const HomePage = () => {
       if (categoriesResponse.status === 'fulfilled') {
         setCategories(categoriesResponse.value.data.data || []);
       }
+      setLoading(false);
     };
     loadStorefront();
   }, []);
@@ -99,13 +102,15 @@ const HomePage = () => {
       <section className="section dark">
         <div className="section-eyebrow anim">Featured products</div>
         <div className="section-title anim">Popular right now</div>
-        <div className="peep-shop-grid peep-home-product-grid">
-          {products.length ? products.map((product, idx) => (
-            <div className="anim" key={product._id} style={{ transitionDelay: `${idx * 50}ms` }}>
-              <ProductCard product={product} />
-            </div>
-          )) : <p className="peep-shop-empty">No products are available yet.</p>}
-        </div>
+        {loading ? <ProductLoadingState /> : (
+          <div className="peep-shop-grid peep-home-product-grid">
+            {products.length ? products.map((product, idx) => (
+              <div className="anim" key={product._id} style={{ transitionDelay: `${idx * 50}ms` }}>
+                <ProductCard product={product} />
+              </div>
+            )) : <p className="peep-shop-empty">No products are available yet.</p>}
+          </div>
+        )}
         <div className="peep-home-products-link anim">
           <Link to="/shop" className="btn btn-ghost"><i className="ti ti-arrow-right"></i> View all products</Link>
         </div>

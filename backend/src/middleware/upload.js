@@ -31,21 +31,22 @@ const createWatermark = async (width) => {
       channels: logo.info.channels,
     },
   }).png().toBuffer();
-  const textSize = Math.max(10, Math.round(logo.info.height * 0.2));
+  const leftMargin = Math.max(12, Math.round(width * 0.02));
+  const textSize = Math.max(10, Math.round(logo.info.height * 0.78));
   const textWidth = Math.round(textSize * 7.8);
-  const textSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${textWidth}" height="${logo.info.height}"><text x="0" y="${Math.round(logo.info.height / 2 + textSize * 0.35)}" fill="white" fill-opacity="0.72" stroke="#050D1A" stroke-opacity="0.55" stroke-width="0.8" paint-order="stroke" font-family="Arial, sans-serif" font-size="${textSize}" font-weight="600">peeponline.store</text></svg>`;
+  const textSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${textWidth}" height="${logo.info.height}"><text x="0" y="${Math.round(logo.info.height * 0.78)}" fill="white" fill-opacity="0.72" stroke="#050D1A" stroke-opacity="0.55" stroke-width="0.8" paint-order="stroke" font-family="Arial, sans-serif" font-size="${textSize}" font-weight="600">peeponline.store</text></svg>`;
 
   return sharp({
     create: {
-      width: logo.info.width + textWidth + 8,
+      width: leftMargin + logo.info.width + textWidth + 8,
       height: logo.info.height,
       channels: 4,
       background: { r: 0, g: 0, b: 0, alpha: 0 },
     },
   })
     .composite([
-      { input: logoBuffer, left: 0, top: 0 },
-      { input: Buffer.from(textSvg), left: logo.info.width + 8, top: 0 },
+      { input: logoBuffer, left: leftMargin, top: 0 },
+      { input: Buffer.from(textSvg), left: leftMargin + logo.info.width + 8, top: 0 },
     ])
     .png()
     .toBuffer();
