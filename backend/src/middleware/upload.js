@@ -8,6 +8,37 @@ const { productUploadDirectory } = require('../config/uploads');
 fs.mkdirSync(productUploadDirectory, { recursive: true });
 const watermarkPath = path.resolve(process.env.WATERMARK_PATH || path.join(__dirname, '../../../frontend/public/logo.png'));
 
+const watermarkGlyphs = {
+  '.': ['00000', '00000', '00000', '00000', '00000', '00100', '00100'],
+  e: ['00000', '01110', '10001', '11111', '10000', '10001', '01110'],
+  i: ['00100', '00000', '01100', '00100', '00100', '00100', '01110'],
+  l: ['01100', '00100', '00100', '00100', '00100', '00100', '01110'],
+  n: ['00000', '11110', '10001', '10001', '10001', '10001', '10001'],
+  o: ['00000', '01110', '10001', '10001', '10001', '10001', '01110'],
+  p: ['00000', '11110', '10001', '10001', '11110', '10000', '10000'],
+  r: ['00000', '10110', '11001', '10000', '10000', '10000', '10000'],
+  s: ['00000', '01111', '10000', '01110', '00001', '11110', '00000'],
+  t: ['00100', '11111', '00100', '00100', '00100', '00101', '00010'],
+};
+
+const createWatermarkText = (text, unit) => {
+  const rectangles = [];
+  [...text].forEach((character, characterIndex) => {
+    const glyph = watermarkGlyphs[character];
+    if (!glyph) return;
+
+    glyph.forEach((row, rowIndex) => {
+      [...row].forEach((pixel, columnIndex) => {
+        if (pixel === '1') {
+          rectangles.push(`<rect x="${(characterIndex * 6 + columnIndex) * unit}" y="${rowIndex * unit}" width="${unit}" height="${unit}"/>`);
+        }
+      });
+    });
+  });
+
+  return rectangles.join('');
+};
+
 const createWatermark = async (width) => {
   try {
     await fsPromises.access(watermarkPath);
@@ -32,14 +63,17 @@ const createWatermark = async (width) => {
     },
   }).png().toBuffer();
   const leftMargin = Math.max(12, Math.round(width * 0.02));
+  const bottomMargin = Math.max(8, Math.round(width * 0.015));
   const textSize = Math.max(10, Math.round(logo.info.height * 0.78));
-  const textWidth = Math.round(textSize * 7.8);
-  const textSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${textWidth}" height="${logo.info.height}"><text x="0" y="${Math.round(logo.info.height * 0.78)}" fill="white" fill-opacity="0.72" stroke="#050D1A" stroke-opacity="0.55" stroke-width="0.8" paint-order="stroke" font-family="Arial, sans-serif" font-size="${textSize}" font-weight="600">peeponline.store</text></svg>`;
+  const textUnit = Math.max(1, Math.round(textSize / 7));
+  const watermarkText = 'peeponline.store';
+  const textWidth = watermarkText.length * 6 * textUnit;
+  const textSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${textWidth}" height="${logo.info.height}"><g fill="white" fill-opacity="0.72">${createWatermarkText(watermarkText, textUnit)}</g></svg>`;
 
   return sharp({
     create: {
       width: leftMargin + logo.info.width + textWidth + 8,
-      height: logo.info.height,
+      height: logo.info.height + bottomMargin,
       channels: 4,
       background: { r: 0, g: 0, b: 0, alpha: 0 },
     },
