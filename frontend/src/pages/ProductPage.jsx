@@ -4,9 +4,39 @@ import api, { getAssetUrl } from '../api/axiosConfig';
 import { useCart } from '../context/CartContext';
 import { useSaved } from '../context/SavedContext';
 import { useAuth } from '../context/AuthContext';
-import LoadingSpinner from '../components/common/LoadingSpinner';
 import ProductReviews from '../components/product/ProductReviews';
 import toast from 'react-hot-toast';
+
+const ProductDetailLoading = () => (
+  <main className="peep-product-detail-page peep-product-detail-loading" aria-busy="true" aria-label="Loading product">
+    <div className="peep-product-detail-shell">
+      <div className="peep-product-detail-grid">
+        <section className="peep-product-gallery">
+          <div className="peep-detail-skeleton peep-detail-skeleton-image"></div>
+          <div className="peep-detail-skeleton-thumbnails">
+            <div className="peep-detail-skeleton peep-detail-skeleton-thumb"></div>
+            <div className="peep-detail-skeleton peep-detail-skeleton-thumb"></div>
+            <div className="peep-detail-skeleton peep-detail-skeleton-thumb"></div>
+          </div>
+        </section>
+        <section className="peep-product-detail-copy">
+          <div className="peep-detail-skeleton peep-detail-skeleton-kicker"></div>
+          <div className="peep-detail-skeleton peep-detail-skeleton-title"></div>
+          <div className="peep-detail-skeleton peep-detail-skeleton-price"></div>
+          <div className="peep-detail-skeleton peep-detail-skeleton-stock"></div>
+          <div className="peep-detail-skeleton peep-detail-skeleton-heading"></div>
+          <div className="peep-detail-skeleton peep-detail-skeleton-line"></div>
+          <div className="peep-detail-skeleton peep-detail-skeleton-line short"></div>
+          <div className="peep-detail-skeleton-buy">
+            <div className="peep-detail-skeleton peep-detail-skeleton-quantity"></div>
+            <div className="peep-detail-skeleton peep-detail-skeleton-button"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <span className="sr-only">Loading product details...</span>
+  </main>
+);
 
 const ProductPage = () => {
   const { id } = useParams();
@@ -85,7 +115,7 @@ const ProductPage = () => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isZoomed]);
 
-  if (loading) return <LoadingSpinner />;
+  if (loading) return <ProductDetailLoading />;
   if (!product) return <div>Product not found</div>;
 
   const images = product.images?.length ? product.images : [{ url: '/placeholder.png' }];
