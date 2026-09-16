@@ -50,7 +50,7 @@ const Header = () => {
     <>
       <nav className="nav">
         <Link to="/" className="nav-logo">
-          <img src="logo.png" alt="Peep logo" />
+          <img src="/logo.png" alt="Peep logo" />
           <span className="nav-logo-text">PEEP<span>.</span></span>
         </Link>
 

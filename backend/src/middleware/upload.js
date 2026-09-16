@@ -20,6 +20,8 @@ const watermarkGlyphs = {
   s: ['00000', '01111', '10000', '01110', '00001', '11110', '00000'],
   t: ['00100', '11111', '00100', '00100', '00100', '00101', '00010'],
 };
+const PRODUCT_IMAGE_WIDTH = 1600;
+const PRODUCT_IMAGE_HEIGHT = 1200;
 
 const createWatermarkText = (text, unit) => {
   const rectangles = [];
@@ -90,7 +92,13 @@ const processUploadedImages = async (files) => {
   for (const file of files) {
     const resized = await sharp(file.path)
       .rotate()
-      .resize({ width: 1600, height: 1600, fit: 'inside', withoutEnlargement: true })
+      .resize({
+        width: PRODUCT_IMAGE_WIDTH,
+        height: PRODUCT_IMAGE_HEIGHT,
+        fit: 'contain',
+        withoutEnlargement: true,
+        background: { r: 13, g: 24, b: 43, alpha: 1 },
+      })
       .toBuffer({ resolveWithObject: true });
     const watermark = await createWatermark(resized.info.width);
     const processed = await sharp(resized.data)

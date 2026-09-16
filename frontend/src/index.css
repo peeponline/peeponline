@@ -323,7 +323,7 @@ body {
 .peep-shop-product-image img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 .peep-shop-product-image .ti { font-size: 46px; }
 .prod-card > a { display: block; color: inherit; text-decoration: none; }
