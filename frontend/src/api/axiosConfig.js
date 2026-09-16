@@ -12,6 +12,13 @@ export const getAssetUrl = (assetPath) => {
   return `${API_URL.replace(/\/api\/?$/, '')}${assetPath}`;
 };
 
+export const getProductImageUrl = (image, variant = 'detail') => {
+  const assetPath = variant === 'thumbnail'
+    ? image?.thumbnailUrl || image?.detailUrl || image?.url
+    : image?.detailUrl || image?.url;
+  return getAssetUrl(assetPath);
+};
+
 api.interceptors.response.use(
   (res) => res,
   (error) => {

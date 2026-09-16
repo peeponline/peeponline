@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import api, { getAssetUrl } from '../api/axiosConfig';
+import api, { getProductImageUrl } from '../api/axiosConfig';
 import { useCart } from '../context/CartContext';
 import { useSaved } from '../context/SavedContext';
 import { useAuth } from '../context/AuthContext';
@@ -119,7 +119,7 @@ const ProductPage = () => {
   if (!product) return <div>Product not found</div>;
 
   const images = product.images?.length ? product.images : [{ url: '/placeholder.png' }];
-  const imageUrl = getAssetUrl(images[selectedImage]?.url || images[0].url);
+  const imageUrl = getProductImageUrl(images[selectedImage]);
   const discountedPrice = product.price * (1 - product.discount / 100);
 
   return (
@@ -134,7 +134,7 @@ const ProductPage = () => {
               <img src={imageUrl} alt={product.name} draggable="false" />
               {product.discount > 0 && <span className="peep-product-deal-badge">Deal -{product.discount}%</span>}
             </div>
-            {images.length > 1 && <div className="peep-product-thumbnails">{images.map((image, index) => <button className={selectedImage === index ? 'active' : ''} type="button" key={image._id || image.url} onClick={() => setSelectedImage(index)}><img src={getAssetUrl(image.url)} alt={`${product.name} view ${index + 1}`} /></button>)}</div>}
+            {images.length > 1 && <div className="peep-product-thumbnails">{images.map((image, index) => <button className={selectedImage === index ? 'active' : ''} type="button" key={image._id || image.url} onClick={() => setSelectedImage(index)}><img src={getProductImageUrl(image, 'thumbnail')} alt={`${product.name} view ${index + 1}`} /></button>)}</div>}
           </section>
           <section className="peep-product-detail-copy">
             <div className="peep-product-detail-kicker">{product.tab || 'Technology'}{product.category?.name && ` · ${product.category.name}`}</div>

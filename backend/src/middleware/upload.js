@@ -20,8 +20,10 @@ const watermarkGlyphs = {
   s: ['00000', '01111', '10000', '01110', '00001', '11110', '00000'],
   t: ['00100', '11111', '00100', '00100', '00100', '00101', '00010'],
 };
-const PRODUCT_IMAGE_WIDTH = 1600;
-const PRODUCT_IMAGE_HEIGHT = 1200;
+const DETAIL_IMAGE_WIDTH = 2400;
+const DETAIL_IMAGE_HEIGHT = 1800;
+const THUMBNAIL_IMAGE_WIDTH = 640;
+const THUMBNAIL_IMAGE_HEIGHT = 480;
 
 const createWatermarkText = (text, unit) => {
   const rectangles = [];
@@ -90,29 +92,41 @@ const createWatermark = async (width) => {
 
 const processUploadedImages = async (files) => {
   for (const file of files) {
-    const resized = await sharp(file.path)
-      .rotate()
-      .resize({
-        width: PRODUCT_IMAGE_WIDTH,
-        height: PRODUCT_IMAGE_HEIGHT,
-        fit: 'contain',
-        withoutEnlargement: true,
-        background: { r: 13, g: 24, b: 43, alpha: 1 },
-      })
-      .toBuffer({ resolveWithObject: true });
-    const watermark = await createWatermark(resized.info.width);
-    const processed = await sharp(resized.data)
-      .composite(watermark ? [{ input: watermark, gravity: 'southwest' }] : [])
-      .webp({ quality: 90, effort: 4 })
-      .toBuffer();
-    const outputPath = path.join(path.dirname(file.path), `${path.basename(file.path, path.extname(file.path))}.webp`);
+    const basePath = path.join(path.dirname(file.path), path.basename(file.path, path.extname(file.path)));
+    const createVariant = async (suffix, width, height, quality) => {
+      const resized = await sharp(file.path)
+        .rotate()
+        .resize({
+          width,
+          height,
+          fit: 'contain',
+          withoutEnlargement: true,
+          background: { r: 13, g: 24, b: 43, alpha: 1 },
+        })
+        .toBuffer({ resolveWithObject: true });
+      const watermark = await createWatermark(resized.info.width);
+      return {
+        path: `${basePath}-${suffix}.webp`,
+        buffer: await sharp(resized.data)
+          .composite(watermark ? [{ input: watermark, gravity: 'southwest' }] : [])
+          .webp(quality === 100 ? { lossless: true, effort: 4 } : { quality, effort: 4 })
+          .toBuffer(),
+      };
+    };
 
-    await fsPromises.writeFile(outputPath, processed);
-    if (outputPath !== file.path) await fsPromises.unlink(file.path);
-    file.path = outputPath;
-    file.filename = path.basename(outputPath);
+    const detail = await createVariant('detail', DETAIL_IMAGE_WIDTH, DETAIL_IMAGE_HEIGHT, 100);
+    const thumbnail = await createVariant('thumb', THUMBNAIL_IMAGE_WIDTH, THUMBNAIL_IMAGE_HEIGHT, 86);
+    await Promise.all([
+      fsPromises.writeFile(detail.path, detail.buffer),
+      fsPromises.writeFile(thumbnail.path, thumbnail.buffer),
+    ]);
+    await fsPromises.unlink(file.path);
+    file.path = detail.path;
+    file.filename = path.basename(detail.path);
+    file.detailFilename = path.basename(detail.path);
+    file.thumbnailFilename = path.basename(thumbnail.path);
     file.mimetype = 'image/webp';
-    file.size = processed.length;
+    file.size = detail.buffer.length;
   }
 };
 

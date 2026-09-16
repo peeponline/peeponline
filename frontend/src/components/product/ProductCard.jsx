@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
-import { getAssetUrl } from '../../api/axiosConfig';
+import { getProductImageUrl } from '../../api/axiosConfig';
 
 const ProductCard = ({ product }) => {
   const { _id, name, price, images, stock, discount, category, description } = product;
-  const imageUrl = images?.length ? getAssetUrl(images[0].url) : '/placeholder.png';
+  const imageUrl = images?.length ? getProductImageUrl(images[0], 'thumbnail') : '/placeholder.png';
   const discountedPrice = price * (1 - discount / 100);
   const categoryName = typeof category === 'object' ? category?.name : category;
   const { addToCart } = useCart();

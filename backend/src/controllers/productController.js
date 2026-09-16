@@ -8,12 +8,16 @@ const { processUploadedImages } = require('../middleware/upload');
 
 const removeStoredImage = async (image) => {
   if (!image?.url) return;
-  const filePath = path.join(uploadsDirectory, image.url.replace(/^\/uploads\//, ''));
-  try {
-    await fs.unlink(filePath);
-  } catch (error) {
-    if (error.code !== 'ENOENT') throw error;
-  }
+  const storedPaths = [image.url, image.detailUrl, image.thumbnailUrl]
+    .filter(Boolean)
+    .map((url) => path.join(uploadsDirectory, url.replace(/^\/uploads\//, '')));
+  await Promise.all(storedPaths.map(async (filePath) => {
+    try {
+      await fs.unlink(filePath);
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+    }
+  }));
 };
 
 // ==================== HELPER: Filter & Pagination ====================
@@ -133,8 +137,10 @@ exports.createProduct = async (req, res) => {
 
     await processUploadedImages(req.files || []);
     const images = (req.files || []).map((file) => ({
-      public_id: file.filename,
-      url: `/uploads/products/${file.filename}`,
+      public_id: file.detailFilename,
+      url: `/uploads/products/${file.detailFilename}`,
+      detailUrl: `/uploads/products/${file.detailFilename}`,
+      thumbnailUrl: `/uploads/products/${file.thumbnailFilename}`,
     }));
 
     const product = await Product.create({
@@ -188,8 +194,10 @@ exports.updateProduct = async (req, res) => {
       for (const img of product.images) await removeStoredImage(img);
       // Set new images
       product.images = req.files.map(file => ({
-        public_id: file.filename,
-        url: `/uploads/products/${file.filename}`,
+        public_id: file.detailFilename,
+        url: `/uploads/products/${file.detailFilename}`,
+        detailUrl: `/uploads/products/${file.detailFilename}`,
+        thumbnailUrl: `/uploads/products/${file.thumbnailFilename}`,
       }));
     }
 
