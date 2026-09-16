@@ -93,7 +93,7 @@ const createWatermark = async (width) => {
 const processUploadedImages = async (files) => {
   for (const file of files) {
     const basePath = path.join(path.dirname(file.path), path.basename(file.path, path.extname(file.path)));
-    const createVariant = async (suffix, width, height, quality, fit, background) => {
+    const createVariant = async (suffix, width, height, quality, fit, background, addWatermark) => {
       const resized = await sharp(file.path)
         .rotate()
         .resize({
@@ -104,7 +104,7 @@ const processUploadedImages = async (files) => {
           ...(background ? { background } : {}),
         })
         .toBuffer({ resolveWithObject: true });
-      const watermark = await createWatermark(resized.info.width);
+      const watermark = addWatermark ? await createWatermark(resized.info.width) : null;
       return {
         path: `${basePath}-${suffix}.webp`,
         buffer: await sharp(resized.data)
@@ -114,7 +114,7 @@ const processUploadedImages = async (files) => {
       };
     };
 
-    const detail = await createVariant('detail', DETAIL_IMAGE_WIDTH, DETAIL_IMAGE_HEIGHT, 100, 'inside');
+    const detail = await createVariant('detail', DETAIL_IMAGE_WIDTH, DETAIL_IMAGE_HEIGHT, 100, 'inside', undefined, true);
     const thumbnail = await createVariant(
       'thumb',
       THUMBNAIL_IMAGE_WIDTH,
@@ -122,6 +122,7 @@ const processUploadedImages = async (files) => {
       86,
       'contain',
       { r: 13, g: 24, b: 43, alpha: 1 },
+      false,
     );
     await Promise.all([
       fsPromises.writeFile(detail.path, detail.buffer),

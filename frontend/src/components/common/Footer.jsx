@@ -16,7 +16,7 @@ const Footer = () => {
             <a href="https://instagram.com/PeepOnlinemarketplace" className="footer-social" target="_blank" rel="noopener noreferrer"><i className="ti ti-brand-instagram"></i></a>
             <a href="https://www.facebook.com/844395632089629" className="footer-social" target="_blank" rel="noopener noreferrer"><i className="ti ti-brand-facebook"></i></a>
             <a href="https://wa.me/233503035014" className="footer-social" target="_blank" rel="noopener noreferrer"><i className="ti ti-brand-whatsapp"></i></a>
-            <a href="mailto:peeponline.marketplace@gmail.com" className="footer-social"><i className="ti ti-mail"></i></a>
+            <a href="mailto:mail@peeponline.store" className="footer-social"><i className="ti ti-mail"></i></a>
           </div>
         </div>
 

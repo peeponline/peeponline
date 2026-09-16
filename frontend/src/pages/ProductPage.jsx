@@ -131,7 +131,20 @@ const ProductPage = () => {
             <div className="peep-product-main-image" onPointerDown={handlePointerDown} onPointerUp={handlePointerUp} onPointerCancel={() => { swipeStart.current = null; }}>
               <button className="peep-gallery-zoom-trigger" type="button" onClick={openZoom} aria-label="Zoom product image"><i className="ti ti-zoom-in"></i></button>
               {images.length > 1 && <><button className="peep-gallery-arrow previous" type="button" onClick={() => changeImage(-1)} aria-label="Previous product image"><i className="ti ti-chevron-left"></i></button><button className="peep-gallery-arrow next" type="button" onClick={() => changeImage(1)} aria-label="Next product image"><i className="ti ti-chevron-right"></i></button></>}
-              <img src={imageUrl} alt={product.name} draggable="false" />
+              <img
+                src={imageUrl}
+                alt={`${product.name}, click to enlarge`}
+                draggable="false"
+                role="button"
+                tabIndex="0"
+                onClick={openZoom}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    openZoom();
+                  }
+                }}
+              />
               {product.discount > 0 && <span className="peep-product-deal-badge">Deal -{product.discount}%</span>}
             </div>
             {images.length > 1 && <div className="peep-product-thumbnails">{images.map((image, index) => <button className={selectedImage === index ? 'active' : ''} type="button" key={image._id || image.url} onClick={() => setSelectedImage(index)}><img src={getProductImageUrl(image, 'thumbnail')} alt={`${product.name} view ${index + 1}`} /></button>)}</div>}
