@@ -47,6 +47,8 @@ const ProductPage = () => {
   const [isZoomed, setIsZoomed] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
   const swipeStart = useRef(null);
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const panStart = useRef(null);
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const { isSaved, toggleSaved } = useSaved();
@@ -81,6 +83,7 @@ const ProductPage = () => {
 
   const changeImage = (direction) => {
     setSelectedImage((current) => (current + direction + images.length) % images.length);
+    setPanOffset({ x: 0, y: 0 });
   };
 
   const handlePointerDown = (event) => {
@@ -96,12 +99,44 @@ const ProductPage = () => {
 
   const openZoom = () => {
     setZoomLevel(1);
+    setPanOffset({ x: 0, y: 0 });
     setIsZoomed(true);
   };
 
   const closeZoom = () => {
     setIsZoomed(false);
     setZoomLevel(1);
+    setPanOffset({ x: 0, y: 0 });
+  };
+
+  const handleZoomPointerDown = (event) => {
+    if (zoomLevel <= 1) return;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    panStart.current = { x: event.clientX, y: event.clientY, offset: panOffset };
+  };
+
+  const handleZoomPointerMove = (event) => {
+    if (!panStart.current) return;
+    const distanceX = event.clientX - panStart.current.x;
+    const distanceY = event.clientY - panStart.current.y;
+    const limit = Math.max(0, (zoomLevel - 1) * 420);
+    setPanOffset({
+      x: Math.max(-limit, Math.min(limit, panStart.current.offset.x + distanceX)),
+      y: Math.max(-limit, Math.min(limit, panStart.current.offset.y + distanceY)),
+    });
+  };
+
+  const handleZoomPointerUp = (event) => {
+    if (panStart.current) event.currentTarget.releasePointerCapture(event.pointerId);
+    panStart.current = null;
+  };
+
+  const adjustZoom = (amount) => {
+    setZoomLevel((current) => {
+      const nextLevel = Math.max(1, Math.min(3, current + amount));
+      if (nextLevel === 1) setPanOffset({ x: 0, y: 0 });
+      return nextLevel;
+    });
   };
 
   useEffect(() => {
@@ -166,8 +201,16 @@ const ProductPage = () => {
         <button className="peep-lightbox-close" type="button" onClick={closeZoom} aria-label="Close enlarged image"><i className="ti ti-x"></i></button>
         {images.length > 1 && <><button className="peep-gallery-arrow previous" type="button" onClick={(event) => { event.stopPropagation(); changeImage(-1); }} aria-label="Previous product image"><i className="ti ti-chevron-left"></i></button><button className="peep-gallery-arrow next" type="button" onClick={(event) => { event.stopPropagation(); changeImage(1); }} aria-label="Next product image"><i className="ti ti-chevron-right"></i></button></>}
         <div className="peep-lightbox-content" onClick={(event) => event.stopPropagation()}>
-          <img src={imageUrl} alt={product.name} style={{ transform: `scale(${zoomLevel})` }} />
-          <div className="peep-lightbox-controls"><button type="button" onClick={() => setZoomLevel((level) => Math.max(1, level - 0.25))} aria-label="Zoom out"><i className="ti ti-minus"></i></button><span>{Math.round(zoomLevel * 100)}%</span><button type="button" onClick={() => setZoomLevel((level) => Math.min(3, level + 0.25))} aria-label="Zoom in"><i className="ti ti-plus"></i></button></div>
+          <img
+            src={imageUrl}
+            alt={product.name}
+            onPointerDown={handleZoomPointerDown}
+            onPointerMove={handleZoomPointerMove}
+            onPointerUp={handleZoomPointerUp}
+            onPointerCancel={handleZoomPointerUp}
+            style={{ transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoomLevel})` }}
+          />
+          <div className="peep-lightbox-controls"><button type="button" onClick={() => adjustZoom(-0.25)} aria-label="Zoom out"><i className="ti ti-minus"></i></button><span>{Math.round(zoomLevel * 100)}%</span><button type="button" onClick={() => adjustZoom(0.25)} aria-label="Zoom in"><i className="ti ti-plus"></i></button></div>
         </div>
       </div>}
     </div>

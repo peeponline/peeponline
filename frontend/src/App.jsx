@@ -7,6 +7,7 @@ import { SavedProvider } from './context/SavedContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import Header from './components/common/Header';
 import Footer from './components/common/Footer';
+import PrivacyConsent from './components/common/PrivacyConsent';
 import Seo from './components/common/Seo';
 import HomePage from './pages/HomePage';
 import ShopPage from './pages/ShopPage';
@@ -160,6 +161,7 @@ function AppLayout() {
       </main>
       {!hideFooter && <Footer />}
       <Toaster position="top-center" />
+      <PrivacyConsent />
     </div>
   );
 }

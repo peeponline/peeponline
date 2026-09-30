@@ -12,6 +12,7 @@ const sections = [
   { label: 'Orders', path: '/dashboard/orders', icon: 'ti-package' },
   { label: 'Profile', path: '/dashboard/profile', icon: 'ti-user' },
   { label: 'Saved items', path: '/dashboard/saved', icon: 'ti-heart' },
+  { label: 'Privacy & data', path: '/dashboard/privacy', icon: 'ti-shield-lock' },
 ];
 
 const countries = ['Ghana', 'Nigeria'];
@@ -56,6 +57,14 @@ const locations = {
 const countryDialCodes = {
   Ghana: '+233',
   Nigeria: '+234',
+};
+
+const readBrowserJson = (key, fallback) => {
+  try {
+    return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback));
+  } catch {
+    return fallback;
+  }
 };
 
 const parsePhone = (phoneValue = '') => {
@@ -145,6 +154,7 @@ const AccountDashboard = () => {
             {activeSection === 'Orders' && <Orders orders={orders} />}
             {activeSection === 'Profile' && <Profile user={user} />}
             {activeSection === 'Saved items' && <SavedItems savedProducts={savedProducts} />}
+            {activeSection === 'Privacy & data' && <PrivacyControls logout={logout} navigate={navigate} />}
           </>
         )}
       </main>
@@ -400,6 +410,95 @@ const Profile = ({ user }) => {
           </button>
         </div>
       </form>
+    </div>
+  );
+};
+
+const PrivacyControls = ({ logout, navigate }) => {
+  const [exporting, setExporting] = useState(false);
+  const [deletePhrase, setDeletePhrase] = useState('');
+  const [deleting, setDeleting] = useState(false);
+
+  const exportData = async () => {
+    setExporting(true);
+    try {
+      const { data } = await api.get('/users/export');
+      const exportData = {
+        ...data,
+        data: {
+          ...data.data,
+          browserData: {
+            savedProductIds: readBrowserJson('peep-saved-products', []),
+            guestCart: readBrowserJson('peep-guest-cart', { items: [], totalPrice: 0 }),
+            privacyPreferences: readBrowserJson('peep-privacy-preferences', null),
+          },
+        },
+      };
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `peep-personal-data-${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+      toast.success('Your personal data export is ready.');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Unable to export your data right now.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const deleteAccount = async () => {
+    if (deletePhrase !== 'DELETE') return;
+    setDeleting(true);
+    try {
+      await api.delete('/users/delete');
+      localStorage.removeItem('peep-saved-products');
+      localStorage.removeItem('peep-guest-cart');
+      sessionStorage.removeItem('pendingVerificationEmail');
+      sessionStorage.removeItem('pendingPasswordResetEmail');
+      toast.success('Your account has been deleted.');
+      logout();
+      navigate('/', { replace: true });
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Unable to delete your account right now.');
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <div className="peep-privacy-controls">
+      <section className="card peep-account-panel">
+        <h2>Your personal data</h2>
+        <p>Download a copy of the account, saved cart and order information associated with your account.</p>
+        <button type="button" className="btn btn-primary" onClick={exportData} disabled={exporting}>
+          <i className="ti ti-download"></i> {exporting ? 'Preparing export…' : 'Download my data'}
+        </button>
+      </section>
+
+      <section className="card peep-account-panel">
+        <h2>Cookie and storage choices</h2>
+        <p>Essential storage supports sign-in and requested shopping features. Optional categories are off unless you enable them.</p>
+        <button type="button" className="btn btn-ghost" onClick={() => window.dispatchEvent(new Event('peep:open-privacy-settings'))}>
+          Manage privacy preferences
+        </button>
+      </section>
+
+      <section className="card peep-account-panel peep-privacy-delete">
+        <h2>Delete your account</h2>
+        <p>Deleting your account removes your profile and cart and detaches identifying details from order records. Some transaction records may need to be retained to meet legal obligations.</p>
+        <label htmlFor="privacy-delete-confirm">Type DELETE to confirm</label>
+        <input
+          id="privacy-delete-confirm"
+          value={deletePhrase}
+          onChange={(event) => setDeletePhrase(event.target.value)}
+          autoComplete="off"
+        />
+        <button type="button" className="btn peep-privacy-delete-button" onClick={deleteAccount} disabled={deletePhrase !== 'DELETE' || deleting}>
+          {deleting ? 'Deleting account…' : 'Permanently delete account'}
+        </button>
+      </section>
     </div>
   );
 };

@@ -1,6 +1,30 @@
 const User = require('../models/User');
+const Order = require('../models/Order');
+const Cart = require('../models/Cart');
 const bcrypt = require('bcryptjs');
 const { sendProfileUpdatedEmail, sendWelcomeEmail } = require('../utils/email');
+const { eraseUserData } = require('../utils/privacy');
+
+// @desc    Export the authenticated user's personal data
+exports.exportPersonalData = async (req, res) => {
+  try {
+    const [user, orders, cart] = await Promise.all([
+      User.findById(req.user.id).select('name email phone address role isVerified createdAt updatedAt').lean(),
+      Order.find({ user: req.user.id }).select('-__v').lean(),
+      Cart.findOne({ user: req.user.id }).select('-__v').lean(),
+    ]);
+
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    res.status(200).json({
+      success: true,
+      exportedAt: new Date().toISOString(),
+      data: { profile: user, orders, cart },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Unable to export personal data' });
+  }
+};
 
 // @desc    Update logged-in user's profile
 exports.updateProfile = async (req, res) => {
@@ -72,7 +96,15 @@ exports.updateProfile = async (req, res) => {
       console.error('Profile update notification failed:', emailError);
     }
 
-    res.status(200).json({ success: true, message: 'Profile updated successfully', data: user });
+    const profile = user.toObject();
+    delete profile.password;
+    delete profile.verificationOTP;
+    delete profile.verificationOTPExpire;
+    delete profile.resetOTP;
+    delete profile.resetOTPExpire;
+    delete profile.resetPasswordToken;
+    delete profile.resetPasswordExpire;
+    res.status(200).json({ success: true, message: 'Profile updated successfully', data: profile });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -104,9 +136,13 @@ exports.changePassword = async (req, res) => {
 // @desc    Delete own account (optional)
 exports.deleteAccount = async (req, res) => {
   try {
-    await User.findByIdAndDelete(req.user.id);
-    res.status(200).json({ success: true, message: 'Account deleted' });
+    const user = await eraseUserData(req.user.id);
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+    res.status(200).json({
+      success: true,
+      message: 'Account deleted. Order records that must be retained have been detached from your account and identifying details removed.',
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: 'Unable to delete account right now' });
   }
 };

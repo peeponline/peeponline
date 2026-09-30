@@ -129,7 +129,7 @@ exports.getOrderById = async (req, res) => {
     }
 
     // Ensure user can only view own order unless admin
-    if (order.user._id.toString() !== req.user.id && req.user.role !== 'admin') {
+    if (!order.user || (order.user._id.toString() !== req.user.id && req.user.role !== 'admin')) {
       return res.status(403).json({ success: false, message: 'Not authorized to view this order' });
     }
 
@@ -174,7 +174,7 @@ exports.cancelOrder = async (req, res) => {
     }
 
     // Ensure user is owner or admin
-    if (order.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    if (!order.user || (order.user.toString() !== req.user.id && req.user.role !== 'admin')) {
       return res.status(403).json({ success: false, message: 'Not authorized' });
     }
 

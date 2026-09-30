@@ -25,6 +25,29 @@ const DETAIL_IMAGE_HEIGHT = 1800;
 const THUMBNAIL_IMAGE_WIDTH = 640;
 const THUMBNAIL_IMAGE_HEIGHT = 480;
 
+const getWatermarkColor = async (imageBuffer, width, height) => {
+  const sampleWidth = Math.min(width, Math.max(1, Math.round(width * 0.88)));
+  const sampleHeight = Math.min(height, Math.max(1, Math.round(width * 0.11)));
+  const left = Math.min(width - sampleWidth, Math.max(0, Math.round(width * 0.01)));
+  const top = height - sampleHeight;
+  const { data } = await sharp(imageBuffer)
+    .extract({ left, top, width: sampleWidth, height: sampleHeight })
+    .flatten({ background: { r: 5, g: 13, b: 26 } })
+    .toColourspace('srgb')
+    .resize(1, 1)
+    .removeAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+
+  const luminance = [0.2126, 0.7152, 0.0722].reduce((total, weight, channel) => {
+    const value = data[channel] / 255;
+    const linear = value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+    return total + linear * weight;
+  }, 0);
+
+  return luminance > 0.179 ? '#07111f' : '#ffffff';
+};
+
 const createWatermarkText = (text, unit) => {
   const rectangles = [];
   [...text].forEach((character, characterIndex) => {
@@ -43,7 +66,7 @@ const createWatermarkText = (text, unit) => {
   return rectangles.join('');
 };
 
-const createWatermark = async (width) => {
+const createWatermark = async (width, contrastColor) => {
   try {
     await fsPromises.access(watermarkPath);
   } catch (error) {
@@ -56,8 +79,12 @@ const createWatermark = async (width) => {
     .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
-  for (let index = 3; index < logo.data.length; index += logo.info.channels) {
-    logo.data[index] = Math.round(logo.data[index] * 0.38);
+  const [red, green, blue] = contrastColor === '#ffffff' ? [255, 255, 255] : [7, 17, 31];
+  for (let index = 0; index < logo.data.length; index += logo.info.channels) {
+    logo.data[index] = red;
+    logo.data[index + 1] = green;
+    logo.data[index + 2] = blue;
+    logo.data[index + 3] = Math.round(logo.data[index + 3] * 0.92);
   }
   const logoBuffer = await sharp(logo.data, {
     raw: {
@@ -72,7 +99,7 @@ const createWatermark = async (width) => {
   const textUnit = Math.max(1, Math.round(textSize / 7));
   const watermarkText = 'peeponline.store';
   const textWidth = watermarkText.length * 6 * textUnit;
-  const textSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${textWidth}" height="${logo.info.height}"><g fill="white" fill-opacity="0.72">${createWatermarkText(watermarkText, textUnit)}</g></svg>`;
+  const textSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${textWidth}" height="${logo.info.height}"><g fill="${contrastColor}" fill-opacity="0.94">${createWatermarkText(watermarkText, textUnit)}</g></svg>`;
 
   return sharp({
     create: {
@@ -104,7 +131,10 @@ const processUploadedImages = async (files) => {
           ...(background ? { background } : {}),
         })
         .toBuffer({ resolveWithObject: true });
-      const watermark = addWatermark ? await createWatermark(resized.info.width) : null;
+      const contrastColor = addWatermark
+        ? await getWatermarkColor(resized.data, resized.info.width, resized.info.height)
+        : null;
+      const watermark = addWatermark ? await createWatermark(resized.info.width, contrastColor) : null;
       return {
         path: `${basePath}-${suffix}.webp`,
         buffer: await sharp(resized.data)
@@ -156,4 +186,4 @@ const upload = multer({
   },
 });
 
-module.exports = { upload, productUploadDirectory, processUploadedImages };
+module.exports = { upload, productUploadDirectory, processUploadedImages, getWatermarkColor };

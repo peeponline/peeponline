@@ -43,10 +43,21 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use('/uploads', express.static(uploadsDirectory));
+const sessionSecret = process.env.SESSION_SECRET || (process.env.NODE_ENV === 'production' ? null : 'peep-dev-session-secret');
+if (!sessionSecret) {
+  throw new Error('SESSION_SECRET must be set in production');
+}
+
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'peep-session-secret',
+  secret: sessionSecret,
   resave: false,
   saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 24 * 60 * 60 * 1000,
+  },
 }));
 app.use(passport.initialize());
 app.use(passport.session());

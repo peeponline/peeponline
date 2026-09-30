@@ -4,11 +4,12 @@ const Product = require('../models/Product');
 const Category = require('../models/Category');
 const Cart = require('../models/Cart');
 const { sendAbandonedCartEmail } = require('../utils/email');
+const { eraseUserData } = require('../utils/privacy');
 
 // =================== USER MANAGEMENT ===================
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().select('-password');
+    const users = await User.find().select('name email phone address role isVerified createdAt updatedAt');
     res.status(200).json({ success: true, count: users.length, data: users });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -17,7 +18,7 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getUserById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id).select('-password');
+    const user = await User.findById(req.params.id).select('name email phone address role isVerified createdAt updatedAt');
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
     res.status(200).json({ success: true, data: user });
   } catch (error) {
@@ -32,7 +33,7 @@ exports.updateUser = async (req, res) => {
       req.params.id,
       { name, email, role, address, phone },
       { new: true, runValidators: true }
-    ).select('-password');
+    ).select('name email phone address role isVerified createdAt updatedAt');
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
     res.status(200).json({ success: true, data: user });
   } catch (error) {
@@ -42,7 +43,7 @@ exports.updateUser = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
+    const user = await eraseUserData(req.params.id);
     if (!user) return res.status(404).json({ success: false, message: 'User not found' });
     res.status(200).json({ success: true, message: 'User deleted' });
   } catch (error) {

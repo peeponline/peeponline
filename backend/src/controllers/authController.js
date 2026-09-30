@@ -29,7 +29,7 @@ exports.register = async (req, res) => {
     }
 
     const otp = generateOTP();
-    const otpExpire = Date.now() + 10 * 60 * 2000; // 10 minutes
+    const otpExpire = Date.now() + 10 * 60 * 1000;
 
     const user = await User.create({
       name,
@@ -55,7 +55,6 @@ exports.register = async (req, res) => {
     res.status(201).json({
       success: true,
       message: 'Registration successful! Please check your email for the OTP to verify your account.',
-      opt: otp, // For testing purposes; remove in production
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -108,7 +107,7 @@ exports.verifyOTP = async (req, res) => {
       user: { id: user._id, name: user.name, email: user.email, role: user.role },
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message, otp: req.body.otp }); // For testing purposes; remove in production
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -182,7 +181,9 @@ exports.login = async (req, res) => {
 // @desc    Get current user profile
 exports.getMe = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id)
+      .select('name email phone address role googleId welcomeEmailSent isVerified createdAt updatedAt');
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
     res.status(200).json({ success: true, user });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -232,7 +233,6 @@ exports.forgotPassword = async (req, res) => {
     res.status(200).json({
       success: true,
       message: 'Reset OTP sent to your email',
-      ...(process.env.NODE_ENV === 'development' ? { otp } : {}),
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -258,7 +258,7 @@ exports.resetPassword = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(400).json({ success: false, message: 'Invalid or expired OTP' }); // For testing purposes; remove in production
+      return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
     }
 
     // Update password and clear OTP fields

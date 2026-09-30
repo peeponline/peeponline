@@ -731,6 +731,28 @@ body {
 .peep-legal-card p,
 .peep-legal-card li { color: var(--muted); font-size: 14px; line-height: 1.8; }
 .peep-legal-list { list-style: disc; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
+.peep-privacy-backdrop { position: fixed; z-index: 1000; inset: 0; display: flex; align-items: flex-end; justify-content: center; padding: 20px; background: rgba(2, 8, 18, .72); }
+.peep-privacy-consent { width: min(100%, 620px); max-height: min(90vh, 760px); overflow-y: auto; padding: 26px; border: 1px solid var(--border2); border-radius: 16px; background: var(--card); box-shadow: 0 24px 80px rgba(0, 0, 0, .5); }
+.peep-privacy-consent-heading { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+.peep-privacy-icon { width: 44px; height: 44px; display: grid; place-items: center; flex: 0 0 auto; border: 1px solid var(--border2); border-radius: 12px; color: var(--teal); font-size: 22px; }
+.peep-privacy-consent h2 { font: 700 17px var(--font-d); }
+.peep-privacy-consent > p { color: var(--muted); font-size: 13px; line-height: 1.7; }
+.peep-privacy-options { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; }
+.peep-privacy-option { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px; border: 1px solid var(--border); border-radius: 10px; cursor: pointer; }
+.peep-privacy-option div { display: flex; flex-direction: column; gap: 4px; }
+.peep-privacy-option strong { font-size: 13px; }
+.peep-privacy-option small, .peep-privacy-note { color: var(--muted); font-size: 11px; line-height: 1.5; }
+.peep-privacy-option input { width: 18px; height: 18px; accent-color: var(--teal); }
+.peep-privacy-note { padding: 0 2px; }
+.peep-privacy-actions { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
+.peep-privacy-policy-link { display: inline-block; margin-top: 15px; color: var(--muted); font-size: 11px; }
+.peep-privacy-controls { display: flex; flex-direction: column; gap: 16px; }
+.peep-privacy-controls .peep-account-panel > p { max-width: 720px; margin: -6px 0 18px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.peep-privacy-delete { border-color: rgba(255, 107, 53, .35); }
+.peep-privacy-delete > label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 12px; }
+.peep-privacy-delete > input { width: min(100%, 320px); margin-bottom: 14px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--dark); color: var(--white); font: inherit; }
+.peep-privacy-delete-button { border: 1px solid rgba(255, 107, 53, .6); color: #ff9874; }
+.peep-privacy-delete-button:disabled { cursor: not-allowed; opacity: .45; }
 .peep-contact-section > .section-title { margin-bottom: 36px; }
 .peep-contact-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: start; }
 .peep-contact-details { display: flex; flex-direction: column; gap: 14px; }
@@ -1327,6 +1349,8 @@ body {
 .footer-links a:hover {
   color: var(--white);
 }
+.footer-links button { width: fit-content; padding: 0; border: 0; background: none; color: var(--muted); font: 13px var(--font-b); text-align: left; cursor: pointer; }
+.footer-links button:hover { color: var(--white); }
 .footer-bottom {
   border-top: 1px solid var(--border);
   padding-top: 20px;
@@ -2019,7 +2043,8 @@ body {
 .peep-product-main-image:hover .peep-gallery-arrow, .peep-product-main-image:focus-within .peep-gallery-arrow, .peep-gallery-arrow:focus-visible { opacity: 1; }
 .peep-product-lightbox { position: fixed; z-index: 20; inset: 0; display: flex; align-items: center; justify-content: center; padding: 30px; background: rgba(3, 7, 13, .94); }
 .peep-lightbox-content { position: relative; width: min(1000px, 90vw); height: min(80vh, 760px); display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.peep-lightbox-content img { max-width: 100%; max-height: 100%; object-fit: contain; transition: transform .2s ease; }
+.peep-lightbox-content img { max-width: 100%; max-height: 100%; object-fit: contain; cursor: grab; touch-action: none; transition: transform .2s ease; }
+.peep-lightbox-content img:active { cursor: grabbing; }
 .peep-lightbox-close { position: absolute; z-index: 2; top: 22px; right: 24px; width: 42px; height: 42px; border-radius: 50%; font-size: 20px; }
 .peep-product-lightbox .peep-gallery-arrow { opacity: 1; }
 .peep-product-lightbox .peep-gallery-arrow.previous { left: 24px; }

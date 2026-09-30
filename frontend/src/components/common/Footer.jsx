@@ -50,6 +50,7 @@ const Footer = () => {
             <Link to="/dashboard">Dashboard</Link>
             <Link to="/terms">Terms of Service</Link>
             <Link to="/privacy-policy">Privacy Policy</Link>
+            <button type="button" onClick={() => window.dispatchEvent(new Event('peep:open-privacy-settings'))}>Cookie settings</button>
             <Link to="/refund-policy">Refund Policy</Link>
             <a href="mailto:peeponline.marketplace@gmail.com">mail@peeponline.store</a>
             <a href="tel:+233503035014">+233 50 303 5014</a>
