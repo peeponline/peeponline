@@ -105,22 +105,30 @@ const HomePage = () => {
       </div>
 
       {/* Featured Products */}
-      <section className="section dark">
-        <div className="section-eyebrow anim">Featured products</div>
-        <div className="section-title anim">Popular right now</div>
-        {loading ? <ProductLoadingState /> : (
+      {!loading && products.length > 0 && (
+        <section className="section dark">
+          <div className="section-eyebrow anim">Featured products</div>
+          <div className="section-title anim">Popular right now</div>
           <div className="peep-shop-grid peep-home-product-grid">
-            {products.length ? products.map((product, idx) => (
+            {products.map((product, idx) => (
               <div className="anim" key={product._id} style={{ transitionDelay: `${idx * 50}ms` }}>
                 <ProductCard product={product} />
               </div>
-            )) : <p className="peep-shop-empty"><Link to="/shop">No products are available yet.</Link></p>}
+            ))}
           </div>
-        )}
-        <div className="peep-home-products-link anim">
-          <Link to="/shop" className="btn btn-ghost"><i className="ti ti-arrow-right"></i> View all products</Link>
-        </div>
-      </section>
+          <div className="peep-home-products-link anim">
+            <Link to="/shop" className="btn btn-ghost"><i className="ti ti-arrow-right"></i> View all products</Link>
+          </div>
+        </section>
+      )}
+
+      {!loading && products.length === 0 && (
+        <section className="section dark">
+          <div className="peep-home-products-link anim">
+            <Link to="/shop" className="btn btn-ghost"><i className="ti ti-arrow-right"></i> View all products</Link>
+          </div>
+        </section>
+      )}
 
       {/* Products & Services */}
       <section className="section">
