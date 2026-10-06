@@ -732,20 +732,29 @@ body {
 .peep-legal-card li { color: var(--muted); font-size: 14px; line-height: 1.8; }
 .peep-legal-list { list-style: disc; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
 .peep-privacy-backdrop { position: fixed; z-index: 1000; inset: 0; display: flex; align-items: flex-end; justify-content: center; padding: 20px; background: rgba(2, 8, 18, .72); }
-.peep-privacy-consent { width: min(100%, 620px); max-height: min(90vh, 760px); overflow-y: auto; padding: 26px; border: 1px solid var(--border2); border-radius: 16px; background: var(--card); box-shadow: 0 24px 80px rgba(0, 0, 0, .5); }
-.peep-privacy-consent-heading { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
-.peep-privacy-icon { width: 44px; height: 44px; display: grid; place-items: center; flex: 0 0 auto; border: 1px solid var(--border2); border-radius: 12px; color: var(--teal); font-size: 22px; }
-.peep-privacy-consent h2 { font: 700 17px var(--font-d); }
-.peep-privacy-consent > p { color: var(--muted); font-size: 13px; line-height: 1.7; }
-.peep-privacy-options { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; }
-.peep-privacy-option { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 13px; border: 1px solid var(--border); border-radius: 10px; cursor: pointer; }
+.peep-privacy-consent { width: min(100%, 920px); max-height: min(82vh, 540px); overflow-y: auto; padding: 22px 28px 18px; border: 1px solid var(--border2); border-radius: 16px; background: var(--card); box-shadow: 0 24px 80px rgba(0, 0, 0, .5); }
+.peep-privacy-consent-heading { display: flex; flex-direction: column; gap: 5px; margin-bottom: 9px; }
+.peep-privacy-consent h2 { font: 700 19px var(--font-d); }
+.peep-privacy-consent > p { max-width: 800px; color: var(--muted); font-size: 13px; line-height: 1.55; }
+.peep-privacy-options { display: flex; flex-direction: column; gap: 7px; margin-top: 13px; }
+.peep-privacy-option { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 10px; cursor: pointer; }
 .peep-privacy-option div { display: flex; flex-direction: column; gap: 4px; }
 .peep-privacy-option strong { font-size: 13px; }
 .peep-privacy-option small, .peep-privacy-note { color: var(--muted); font-size: 11px; line-height: 1.5; }
 .peep-privacy-option input { width: 18px; height: 18px; accent-color: var(--teal); }
 .peep-privacy-note { padding: 0 2px; }
-.peep-privacy-actions { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; margin-top: 20px; }
-.peep-privacy-policy-link { display: inline-block; margin-top: 15px; color: var(--muted); font-size: 11px; }
+.peep-privacy-actions { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+.peep-privacy-policy-link { display: inline-block; margin-top: 9px; color: var(--muted); font-size: 11px; }
+@media (min-width: 720px) {
+  .peep-privacy-backdrop { align-items: center; }
+}
+@media (max-width: 600px) {
+  .peep-privacy-backdrop { padding: 12px; }
+  .peep-privacy-consent { padding: 19px 17px 15px; max-height: 88vh; }
+  .peep-privacy-consent h2 { font-size: 16px; }
+  .peep-privacy-actions { justify-content: stretch; }
+  .peep-privacy-actions .btn { flex: 1 1 auto; }
+}
 .peep-privacy-controls { display: flex; flex-direction: column; gap: 16px; }
 .peep-privacy-controls .peep-account-panel > p { max-width: 720px; margin: -6px 0 18px; color: var(--muted); font-size: 13px; line-height: 1.7; }
 .peep-privacy-delete { border-color: rgba(255, 107, 53, .35); }

@@ -56,29 +56,26 @@ const PrivacyConsent = () => {
         aria-describedby="peep-privacy-description"
       >
         <div className="peep-privacy-consent-heading">
-          <span className="peep-privacy-icon" aria-hidden="true"><i className="ti ti-shield-check"></i></span>
-          <div>
-            <div className="section-eyebrow">Your privacy</div>
-            <h2 id="peep-privacy-title">Choose your privacy settings</h2>
-          </div>
+          <div className="section-eyebrow">Privacy settings</div>
+          <h2 id="peep-privacy-title">Choose how we use optional data</h2>
         </div>
         <p id="peep-privacy-description">
-          Essential storage keeps sign-in and shopping features working. Optional analytics and marketing storage are off
-          unless you choose to enable them. You can change your choice at any time.
+          We use essential storage for sign-in and shopping. Analytics and marketing are optional and off by default.
+          Choose “Accept all” or “Reject optional,” or customize your choices. You can change them anytime in Cookie settings.
         </p>
 
         {showOptions && (
           <div className="peep-privacy-options">
             <div className="peep-privacy-option">
-              <div><strong>Essential</strong><small>Required for security, sign-in and requested shopping features.</small></div>
+              <div><strong>Essential</strong><small>Required for sign-in, security and shopping.</small></div>
               <input type="checkbox" checked disabled aria-label="Essential storage is always active" />
             </div>
             <label className="peep-privacy-option">
-              <div><strong>Analytics</strong><small>Helps us understand and improve how the store is used.</small></div>
+              <div><strong>Analytics</strong><small>Helps us improve the store.</small></div>
               <input type="checkbox" checked={analytics} onChange={(event) => setAnalytics(event.target.checked)} />
             </label>
             <label className="peep-privacy-option">
-              <div><strong>Marketing</strong><small>Allows optional marketing and advertising storage.</small></div>
+              <div><strong>Marketing</strong><small>Allows optional marketing storage.</small></div>
               <input type="checkbox" checked={marketing} onChange={(event) => setMarketing(event.target.checked)} />
             </label>
             <p className="peep-privacy-note">No optional analytics or advertising trackers are currently activated on this site.</p>
