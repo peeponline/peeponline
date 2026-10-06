@@ -20,7 +20,7 @@ const ShopPage = () => {
     maxPrice: '',
     sort: '-createdAt',
     page: 1,
-    limit: 12,
+    limit: 100,
   });
   const [pagination, setPagination] = useState({ total: 0, pages: 0 });
 
@@ -29,9 +29,15 @@ const ShopPage = () => {
       setLoading(true);
       try {
         const params = new URLSearchParams();
+        const hasActiveFilters = [filters.keyword, filters.category, filters.tab, filters.minPrice, filters.maxPrice].some(Boolean);
+        const requestLimit = hasActiveFilters ? Number(filters.limit || 12) : 100;
+
+        params.set('limit', String(requestLimit));
         Object.entries(filters).forEach(([key, val]) => {
+          if (key === 'limit') return;
           if (val) params.append(key, val);
         });
+
         const [productsResponse, categoriesResponse] = await Promise.all([
           api.get(`/products?${params.toString()}`),
           api.get('/categories'),

@@ -114,7 +114,7 @@ const HomePage = () => {
               <div className="anim" key={product._id} style={{ transitionDelay: `${idx * 50}ms` }}>
                 <ProductCard product={product} />
               </div>
-            )) : <p className="peep-shop-empty">No products are available yet.</p>}
+            )) : <p className="peep-shop-empty"><Link to="/shop">No products are available yet.</Link></p>}
           </div>
         )}
         <div className="peep-home-products-link anim">
