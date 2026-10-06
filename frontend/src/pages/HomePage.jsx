@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import api from '../api/axiosConfig';
 import ProductCard from '../components/product/ProductCard';
 import ProductLoadingState from '../components/product/ProductLoadingState';
+import { getHomeFeaturedProducts, normalizeProductList } from './homePage.utils';
 
 const HomePage = () => {
   const [products, setProducts] = useState([]);
@@ -12,17 +13,22 @@ const HomePage = () => {
   useEffect(() => {
     const loadStorefront = async () => {
       const [productsResponse, categoriesResponse] = await Promise.allSettled([
-          api.get('/products?limit=100&sort=-createdAt'),
+        api.get('/products?limit=100&sort=-createdAt'),
         api.get('/categories'),
       ]);
+
       if (productsResponse.status === 'fulfilled') {
-        setProducts((productsResponse.value.data.products || []).filter((product) => product.isFeatured === true || product.isFeatured === 'true').slice(0, 6));
+        const catalogProducts = normalizeProductList(productsResponse.value.data?.products);
+        setProducts(getHomeFeaturedProducts(catalogProducts));
       }
+
       if (categoriesResponse.status === 'fulfilled') {
-        setCategories(categoriesResponse.value.data.data || []);
+        setCategories(Array.isArray(categoriesResponse.value.data?.data) ? categoriesResponse.value.data.data : []);
       }
+
       setLoading(false);
     };
+
     loadStorefront();
   }, []);
 

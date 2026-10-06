@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import api from '../api/axiosConfig';
 import ProductCard from '../components/product/ProductCard';
 import ProductLoadingState from '../components/product/ProductLoadingState';
+import { normalizeProductList } from './homePage.utils';
 
 const ShopPage = () => {
   const tabs = ['Laptops & Desktops', 'Phones & Tablets', 'Accessories', 'Components & Parts'];
@@ -35,9 +36,14 @@ const ShopPage = () => {
           api.get(`/products?${params.toString()}`),
           api.get('/categories'),
         ]);
-        setProducts(productsResponse.data.products || []);
-        setPagination({ total: productsResponse.data.total, pages: productsResponse.data.pages });
-        setCategories(categoriesResponse.data.data || []);
+
+        const productList = normalizeProductList(productsResponse.data?.products);
+        setProducts(productList);
+        setPagination({
+          total: Number(productsResponse.data?.total || 0),
+          pages: Number(productsResponse.data?.pages || 0),
+        });
+        setCategories(Array.isArray(categoriesResponse.data?.data) ? categoriesResponse.data.data : []);
       } catch (error) {
         console.error(error);
       } finally {

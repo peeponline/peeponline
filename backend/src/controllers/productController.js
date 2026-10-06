@@ -63,7 +63,8 @@ const getFilteredProducts = async (query) => {
     filter.averageRating = { $gte: Number(rating) };
   }
 
-  if (isFeatured === 'true') {
+  const normalizedFeatured = String(isFeatured ?? '').trim().toLowerCase();
+  if (isFeatured === true || isFeatured === 1 || normalizedFeatured === 'true' || normalizedFeatured === '1' || normalizedFeatured === 'yes') {
     filter.isFeatured = true;
   }
 
@@ -143,6 +144,7 @@ exports.createProduct = async (req, res) => {
       thumbnailUrl: `/uploads/products/${file.thumbnailFilename}`,
     }));
 
+    const isFeaturedValue = isFeatured === true || isFeatured === 1 || String(isFeatured ?? '').trim().toLowerCase() === 'true' || String(isFeatured ?? '').trim() === '1';
     const product = await Product.create({
       name,
       description,
@@ -152,7 +154,7 @@ exports.createProduct = async (req, res) => {
       weightKg: weightKg === '' || weightKg === undefined ? 0.5 : weightKg,
       stock: stock || 0,
       discount: discount || 0,
-      isFeatured: isFeatured === 'true' || isFeatured === true,
+      isFeatured: isFeaturedValue,
       images,
     });
 
@@ -186,7 +188,10 @@ exports.updateProduct = async (req, res) => {
     }
     if (stock !== undefined) product.stock = stock;
     if (discount !== undefined) product.discount = discount;
-    if (isFeatured !== undefined) product.isFeatured = isFeatured === 'true' || isFeatured === true;
+    if (isFeatured !== undefined) {
+      const isFeaturedValue = isFeatured === true || isFeatured === 1 || String(isFeatured).trim().toLowerCase() === 'true' || String(isFeatured).trim() === '1';
+      product.isFeatured = isFeaturedValue;
+    }
 
     // Handle new images: if files are uploaded, replace existing ones
     if (req.files && req.files.length > 0) {
